@@ -1,0 +1,140 @@
+TO DO:
+
+> Write python server to handle HTTP requests
+
+	The page should allow the user to:
+		
+		Poll the status of the coffee machine
+		Initiate a new request
+		Cancel a pending request
+
+	A request has the following parameters:
+
+		Time to start brewing for a delayed request (or NOW)
+		Water temperature
+		Amount of water
+
+	The request should then be forwarded to the board, the reply read and forwarded to the user as exit code of the request.
+
+
+> Protocol specs
+
+Message format:
+
+Requests messages
+
+{
+	ID : 32bit unsigned integer
+	USR : 32bit unsigned integer
+	TIME : timestamp
+	CMD : [ BREW | CANCEL | STATE | KEEPWARM ]
+	\newline
+	CMD_PARAM_0 : value_0
+	CMD_PARAM_1 : value_1
+	...
+	CMD_PARAM_N : value_n
+}
+
+{
+	ID : xxx
+	USR : xxx
+	TIME : xxx
+	CMD : BREW
+	\newline
+	EXEC_TIME : timestamp
+	H2O_TEMP : integer between 0 and 100
+	H2O_AMOUNT : integer between 0 and x
+}
+
+{
+	ID : xxx
+	USR : xxx
+	TIME : xxx
+	CMD : CANCEL
+	\newline
+	CANC_ID : xxx
+}
+
+{
+	ID : xxx
+	USR : xxx
+	TIME : xxx
+	CMD : STATE
+	\newline
+}
+
+
+{
+	ID : xxx
+	USR : xxx
+	TIME : xxx
+	CMD : KEEPWARM
+	\newline
+	DURATION : uint32
+}
+
+
+Response messages
+
+{
+	ID : 32bit unsigned integer
+	SERVER : 32bit unsigned integer
+	TIME : timestamp
+	LENGTH : 32bit unsigned integer
+	\newline
+	RESPONSE_PARAM_0 : value_0
+	RESPONSE_PARAM_1 : value_1
+	...
+	RESPONSE_PARAM_N : value_n
+}
+
+BREW_RESPONSE: {
+	ID : xxx
+	SERVER : 32bit unsigned integer
+	TIME : timestamp
+	LENGTH : 32bit unsigned integer
+	\newline
+	STATUS : [ QUEUED | FAILED | READY ]
+	MSG : 256 char
+}
+
+CANCEL_RESPONSE: {
+	ID : xxx
+	SERVER : 32bit unsigned integer
+	TIME : timestamp
+	LENGTH : 32bit unsigned integer
+	\newline
+	STATUS : [ CANCELLED | FAILED ]
+	MSG : 256 char
+}
+
+STATE_RESPONSE: {
+	ID : xxx
+	SERVER : 32bit unsigned integer
+	TIME : timestamp
+	LENGTH : 32bit unsigned integer
+	\newline
+	H2O_TEMP : integer between 0 and 100
+	H2O_AMOUNT : integer between 0 and x
+}
+
+KEEPWARM_RESPONSE: {
+	ID : xxx
+	SERVER : 32bit unsigned integer
+	TIME : timestamp
+	LENGTH : 32bit unsigned integer
+	\newline
+	STATUS : [ TOO_HOT | TOO_COLD ]
+	MSG : 256 char
+}
+
+
+
+
+	
+Board spec
+
+When trying to configure the application for bluetooth, the documentation for cubemx is in packs/docs
+
+PB0 - opto
+PC1 - ADC
